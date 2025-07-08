@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自由配置型食品認知マップ研究</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app" class="screen-container">
+        <div id="screen1" class="screen">
+            <h2>被験者情報を入力してください</h2>
+            <input id="subjectName" type="text" placeholder="お名前" required autocomplete="name">
+            <input id="subjectAge" type="number" placeholder="年齢" min="18" max="99" required autocomplete="age">
+            <input id="subjectEmail" type="email" placeholder="メールアドレス" required autocomplete="email">
+            <button id="goToScreen2Btn">次へ</button>
+            <p class="info-text">※入力された情報は、研究目的以外には使用されません。</p>
+        </div>
+
+        <div id="screen2" class="screen">
+            <h2>実験のやり方・注意事項</h2>
+            <p>この実験では、様々な**食品の画像**を画面に表示します。あなたはこれらの画像を、**あなたの感じる関係性**に基づいて自由に配置してください。</p>
+            <ul>
+                <li>**配置フェーズ**: 食品画像の上にある**青いバー**をドラッグ＆ドロップして、画面上で自由に移動・配置してください。似ていると感じる食品は近くに、似ていないと感じる食品は遠くに置くなど、あなたが自然だと感じるように配置してください。各食品の上にある**丸い[i]ボタン**をクリックすると、その食品の情報を右側のパネルで確認できます。</li>
+                <li>**クラスター作成フェーズ**: 全ての食品を配置し終えたら、「配置を確定する」ボタンを押してください。その後、**マウスで食品を円で囲む**ことでクラスター（グループ）を作成できます。関連性が高いと感じる食品を**3つ以上**含むクラスターを作成し、そのクラスターに名前を付けてください。作成したクラスターは、円をクリックして表示される「削除」ボタンで削除も可能です。</li>
+                <li>**フィードバックフェーズ**: 全てのクラスターを作成（または削除して整理）し終えたら、「クラスターレビューへ進む」ボタンを押してください。その後、作成した各クラスターについて、なぜ作成したかなどの質問に回答していただきます。全ての項目への記入が必要です。</li>
+            </ul>
+            <p>操作に関する不明点があれば、研究者に確認してください。それでは、準備ができたら「実験開始」ボタンを押してください。</p>
+            <button id="startExperimentBtn">実験開始</button>
+            <button id="backToScreen1Btn" class="back-button">前の画面に戻る</button> 
+        </div>
+
+        <div id="screen3" class="screen">
+            <h1>自由配置型食品認知マップ</h1>
+            <div class="experiment-layout-container">
+                <div class="canvas-area">
+                    <div id="canvas-container">
+                        <canvas id="clusterCanvas"></canvas>
+                    </div>
+                </div>
+                <div id="details-panel" class="details-area">
+                    <h3 id="details-food-name"></h3>
+                    <img id="details-food-image" src="" alt="選択された食品の画像" style="display:none;">
+                    <div id="details-food-info"></div>
+                    <p id="details-placeholder" class="info-text" style="display:block;">食品の[i]ボタンをクリックすると、ここに詳細情報が表示されます。</p>
+                </div>
+            </div>
+            <div class="button-controls">
+                <button id="backToScreen2Btn" class="back-button">前の画面に戻る</button> 
+                <button id="finishPlacementBtn">配置を確定する</button>
+                <button id="goToFeedbackBtn" style="display:none;">クラスターレビューへ進む</button>
+                <button id="saveFeedbackAndDataBtn" style="display:none;">全てのフィードバックを記入しデータ保存</button>
+            </div>
+            <div class="spinner" id="loadingSpinner"></div>
+            <p class="info-text" id="statusMessage"></p>
+        </div>
+
+        <div id="screen4" class="screen">
+            <h2>実験にご協力いただきありがとうございました！</h2>
+            <p>データの保存が完了しました。ご協力ありがとうございました。</p>
+            <p class="info-text">この画面を閉じていただいて結構です。</p>
+            <button id="backToStartBtn" class="back-button">最初の画面に戻る</button> 
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
