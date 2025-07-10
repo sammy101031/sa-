@@ -1,5 +1,5 @@
 // DOM要素のキャッシュ
-let appContainer, screen1, screen2, screen3, screen4,
+let appContainer, screen1, screen2, screen3, screen4, screen5,
     subjectNameInput, subjectAgeInput, subjectEmailInput, goToScreen2Btn, startExperimentBtn,
     canvasContainer, clusterCanvas, ctx,
     finishPlacementBtn, goToFeedbackBtn, saveFeedbackAndDataBtn,
@@ -168,11 +168,112 @@ function initializeApp() {
     ctx = clusterCanvas ? clusterCanvas.getContext('2d') : null;
     finishPlacementBtn = document.getElementById('finishPlacementBtn');
     goToFeedbackBtn = document.getElementById('goToFeedbackBtn');
+    // ↓↓↓ これを全部追加 ↓↓↓
+    if (saveFeedbackAndDataBtn) {
+        saveFeedbackAndDataBtn.addEventListener('click', () => {
+            let allProvided = true;
+            if (experimentData.clusters.length > 0) {
+                for (let i = 0; i < experimentData.clusters.length; i++) {
+                    const reasonCreatedEl = document.getElementById(`reasonCreated_${i}`);
+                    const meaningEl = document.getElementById(`meaning_${i}`);
+                    const reasonNameEl = document.getElementById(`reasonName_${i}`);
+                    const checkAndMark = (el) => { if (!el || el.value.trim() === '') { allProvided = false; if (el) el.classList.add('feedback-missing'); return false; } else if (el) { el.classList.remove('feedback-missing'); } return true; };
+                    checkAndMark(reasonCreatedEl); checkAndMark(meaningEl); checkAndMark(reasonNameEl);
+                }
+            }
+            if (!allProvided) { alert("全てのクラスターについて、3つのフィードバック項目すべてを記入してください。\n（未記入の項目は枠が赤くなっています）"); return; }
+            experimentData.clusters.forEach((cluster, index) => {
+                cluster.feedback = {
+                    reasonCreated: document.getElementById(`reasonCreated_${index}`)?.value.trim() || '',
+                    meaning: document.getElementById(`meaning_${index}`)?.value.trim() || '',
+                    reasonName: document.getElementById(`reasonName_${index}`)?.value.trim() || ''
+                };
+            });
+            const unknownFoodsContainer = document.getElementById('q12_unknown_foods');
+            if(unknownFoodsContainer) {
+                unknownFoodsContainer.innerHTML = '';
+                foodList.forEach(food => {
+                    const label = document.createElement('label');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.name = 'unknown_foods[]';
+                    checkbox.value = food.name;
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(` ${food.label}`));
+                    unknownFoodsContainer.appendChild(label);
+                });
+            }
+            showScreen(screen4);
+        });
+    }
+
+    if (submitAndFinishBtn) {
+        submitAndFinishBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const form = document.getElementById('surveyForm');
+            if (!form.checkValidity()) {
+                alert('未回答のアンケート項目があります。全ての項目にご回答ください。');
+                form.reportValidity();
+                return;
+            }
+            const surveyData = {};
+            const formData = new FormData(form);
+            for (const [key, value] of formData.entries()) {
+                if (key.endsWith('[]')) {
+                    const cleanKey = key.slice(0, -2);
+                    if (!surveyData[cleanKey]) surveyData[cleanKey] = [];
+                    surveyData[cleanKey].push(value);
+                } else {
+                    surveyData[key] = value;
+                }
+            }
+            if (!surveyData.unknown_foods) {
+                surveyData.unknown_foods = [];
+            }
+            experimentData.survey = surveyData;
+            showLoading(true, "データを保存中...");
+            try {
+                const dataToSave = { ...experimentData };
+                dataToSave.experimentEndTimeISO = new Date().toISOString();
+                const jsonData = JSON.stringify(dataToSave, null, 2);
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = generateFileName(dataToSave.subjectInfo);
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showScreen(screen5);
+            } catch (error) {
+                console.error('[CRITICAL_ERROR] saveData:', error);
+                alert('データの保存に失敗しました。コンソールを確認してください。');
+            } finally {
+                showLoading(false);
+            }
+        });
+    }
+    
+    if (backToStartBtn2) {
+        backToStartBtn2.addEventListener('click', () => {
+            if (confirm("最初の画面に戻りますか？")) {
+                showScreen(screen1);
+                currentMode = 'intro';
+            }
+        });
+    }
+// ↑↑↑ ここまで全部追加 ↑↑↑
     saveFeedbackAndDataBtn = document.getElementById('saveFeedbackAndDataBtn');
     loadingSpinner = document.getElementById('loadingSpinner');
     statusMessage = document.getElementById('statusMessage');
     detailsPanel = document.getElementById('details-panel');
-
+    screen5 = document.getElementById('screen5');
+    submitAndFinishBtn = document.getElementById('submitAndFinishBtn');
+    backToStartBtn2 = document.getElementById('backToStartBtn2');
+screen5 = document.getElementById('screen5');
+    submitAndFinishBtn = document.getElementById('submitAndFinishBtn');
+    backToStartBtn2 = document.getElementById('backToStartBtn2');
     backToScreen1Btn = document.getElementById('backToScreen1Btn');
     backToScreen2Btn = document.getElementById('backToScreen2Btn');
     backToStartBtn = document.getElementById('backToStartBtn');
@@ -272,23 +373,7 @@ function initializeApp() {
         });
     }
 
-    if (saveFeedbackAndDataBtn) {
-        saveFeedbackAndDataBtn.addEventListener('click', () => {
-            let allProvided = true;
-            if (experimentData.clusters.length > 0) {
-                for (let i = 0; i < experimentData.clusters.length; i++) {
-                    const reasonCreatedEl = document.getElementById(`reasonCreated_${i}`);
-                    const meaningEl = document.getElementById(`meaning_${i}`);
-                    const reasonNameEl = document.getElementById(`reasonName_${i}`);
-                    const checkAndMark = (el) => { if (!el || el.value.trim() === '') { allProvided = false; if(el) el.classList.add('feedback-missing'); return false; } else if(el) { el.classList.remove('feedback-missing'); } return true; };
-                    checkAndMark(reasonCreatedEl); checkAndMark(meaningEl); checkAndMark(reasonNameEl);
-                }
-            }
-            if (!allProvided) { alert("全てのクラスターについて、3つのフィードバック項目すべてを記入してください。\n（未記入の項目は枠が赤くなっています）"); return; }
-            document.querySelectorAll('.cluster-feedback-item textarea.feedback-missing').forEach(ta => ta.classList.remove('feedback-missing'));
-            saveExperimentData();
-        });
-    }
+    
 
     if (backToScreen1Btn) {
         backToScreen1Btn.addEventListener('click', () => {
@@ -456,44 +541,6 @@ function makeDraggable(element, handle) {
     handle.style.cursor = (currentMode === 'placement') ? 'grab' : 'default'; // Set initial cursor
 }
 
-async function saveExperimentData() {
-    console.log('[DEBUG] saveExperimentData: Called');
-    showLoading(true, "データを保存中...");
-    experimentData.clusters.forEach((cluster, index) => {
-        cluster.feedback = { // Ensure feedback object structure
-            reasonCreated: document.getElementById(`reasonCreated_${index}`)?.value.trim() || '',
-            meaning: document.getElementById(`meaning_${index}`)?.value.trim() || '',
-            reasonName: document.getElementById(`reasonName_${index}`)?.value.trim() || ''
-        };
-    });
-    experimentData.moveHistory.push({ timestamp: getCurrentTimestamp(), eventType: 'saveDataAttempt', target: 'system' });
-    const dataToSave = {
-        subjectInfo: experimentData.subjectInfo,
-        foodListUsed: foodList.map(f => ({name: f.name, label: f.label})), // Save names and labels of food items
-        finalPositions: experimentData.positions,
-        clusters: experimentData.clusters,
-        placementTimeSeconds: experimentData.placementTime,
-        moveHistory: experimentData.moveHistory,
-        experimentStartTimeISO: experimentData.startTime ? new Date(experimentData.startTime).toISOString() : null,
-        experimentEndTimeISO: new Date().toISOString()
-    };
-    try {
-        const jsonData = JSON.stringify(dataToSave, null, 2);
-        const blob = new Blob([jsonData], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = generateFileName(dataToSave.subjectInfo);
-        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-        updateStatusMessage('データが正常に保存されました。ありがとうございました。');
-        if(screen4) showScreen(screen4);
-    } catch (error) {
-        console.error('[CRITICAL_ERROR] saveExperimentData:', error);
-        updateStatusMessage('エラー: データの保存に失敗しました。');
-        alert('データの保存に失敗しました。コンソールを確認してください。');
-    } finally {
-        showLoading(false);
-    }
-}
 
 // --- クラスター描画関連 ---
 function handleClusterMouseDown(e) {
