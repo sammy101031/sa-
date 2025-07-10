@@ -501,9 +501,10 @@ function handleClusterMouseDown(e) {
     removeActiveDeleteButton(); isDrawingCluster = true;
     const rect = clusterCanvas.getBoundingClientRect();
     const startX = e.clientX - rect.left, startY = e.clientY - rect.top;
-    currentDrawingCluster = {
+currentDrawingCluster = {
         id: `cluster_${Date.now()}_${Math.random().toString(36).substr(2,5)}`, type: 'circle',
-        centerX: startX, centerY: startY, radius: 0,
+        anchorX: startX, anchorY: startY, // クリック始点をアンカーとして保存
+        centerX: startX, centerY: startY, radius: 0, // 描画用の中心と半径を初期化
         name: '', items: [], color: getRandomClusterColor(), feedback: {}
     };
     clusterCanvas.addEventListener('mousemove', handleClusterMouseMove);
