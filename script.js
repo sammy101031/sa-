@@ -299,26 +299,31 @@ function initializeApp() {
             }
             experimentData.survey = surveyData;
             showLoading(true, "データを保存中...");
-            try {
-                const dataToSave = { ...experimentData };
-                dataToSave.experimentEndTimeISO = new Date().toISOString();
-                const jsonData = JSON.stringify(dataToSave, null, 2);
-                const blob = new Blob([jsonData], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = generateFileName(dataToSave.subjectInfo);
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showScreen(screen5);
-            } catch (error) {
-                console.error('[CRITICAL_ERROR] saveData:', error);
-                alert('データの保存に失敗しました。コンソールを確認してください。');
-            } finally {
-                showLoading(false);
-            }
+ try {
+    const gasWebAppUrl = 'https://script.google.com/macros/s/AKfycbz0bmNUp44bmRt6_HEC1kulC1SAcEhP7VljceEIT4uqrXfb5wA-ICiO2YN1WlPTYvsA/exec'; // ★★★必ず書き換えてください★★★
+
+    const dataToSave = { ...experimentData };
+    dataToSave.experimentEndTimeISO = new Date().toISOString();
+
+    // GASにデータを送信
+    await fetch(gasWebAppUrl, {
+        method: 'POST',
+        mode: 'no-cors', // CORSエラーを回避するためのおまじない
+        headers: {
+            'Content-Type': 'text/plain;charset=utf-8',
+        },
+        body: JSON.stringify(dataToSave)
+    });
+
+    // 成功したら完了画面へ
+    showScreen(screen5);
+
+} catch (error) {
+    console.error('[CRITICAL_ERROR] Data submission failed:', error);
+    alert('データの送信に失敗しました。管理者にお知らせください。');
+} finally {
+    showLoading(false);
+}
         });
     }
 
