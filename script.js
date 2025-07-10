@@ -515,10 +515,23 @@ currentDrawingCluster = {
 
 function handleClusterMouseMove(e) {
     if (!isDrawingCluster || !currentDrawingCluster || currentDrawingCluster.type !== 'circle') return;
-    const rect = clusterCanvas.getBoundingClientRect();
-    const currentX = e.clientX - rect.left, currentY = e.clientY - rect.top;
-    const dx = currentX - currentDrawingCluster.centerX, dy = currentY - currentDrawingCluster.centerY;
-    currentDrawingCluster.radius = Math.sqrt(dx * dx + dy * dy);
+const rect = clusterCanvas.getBoundingClientRect();
+    const currentX = e.clientX - rect.left;
+    const currentY = e.clientY - rect.top;
+    const anchorX = currentDrawingCluster.anchorX;
+    const anchorY = currentDrawingCluster.anchorY;
+
+    // 始点と現在地から、新しい中心と半径を計算する
+    const newCenterX = (anchorX + currentX) / 2;
+    const newCenterY = (anchorY + currentY) / 2;
+    const dx = currentX - anchorX;
+    const dy = currentY - anchorY;
+    const newRadius = Math.sqrt(dx * dx + dy * dy) / 2;
+
+    // 計算結果を描画用オブジェクトに格納
+    currentDrawingCluster.centerX = newCenterX;
+    currentDrawingCluster.centerY = newCenterY;
+    currentDrawingCluster.radius = newRadius;
 
     ctx.clearRect(0, 0, clusterCanvas.width, clusterCanvas.height);
     drawAllClusters();
