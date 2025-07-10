@@ -274,59 +274,62 @@ function initializeApp() {
         });
     }
 
-    if (submitAndFinishBtn) {
-        submitAndFinishBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const form = document.getElementById('surveyForm');
-            if (!form.checkValidity()) {
-                alert('未回答のアンケート項目があります。全ての項目にご回答ください。');
-                form.reportValidity();
-                return;
+   // ▼▼▼ このブロックを丸ごと追加 ▼▼▼
+if (submitAndFinishBtn) {
+    submitAndFinishBtn.addEventListener('click', async (e) => { // async を追加
+        e.preventDefault();
+        const form = document.getElementById('surveyForm');
+        if (!form.checkValidity()) {
+            alert('未回答のアンケート項目があります。全ての項目にご回答ください。');
+            form.reportValidity();
+            return;
+        }
+        const surveyData = {};
+        const formData = new FormData(form);
+        for (const [key, value] of formData.entries()) {
+            if (key.endsWith('[]')) {
+                const cleanKey = key.slice(0, -2);
+                if (!surveyData[cleanKey]) surveyData[cleanKey] = [];
+                surveyData[cleanKey].push(value);
+            } else {
+                surveyData[key] = value;
             }
-            const surveyData = {};
-            const formData = new FormData(form);
-            for (const [key, value] of formData.entries()) {
-                if (key.endsWith('[]')) {
-                    const cleanKey = key.slice(0, -2);
-                    if (!surveyData[cleanKey]) surveyData[cleanKey] = [];
-                    surveyData[cleanKey].push(value);
-                } else {
-                    surveyData[key] = value;
+        }
+        if (!surveyData.unknown_foods) {
+            surveyData.unknown_foods = [];
+        }
+        experimentData.survey = surveyData;
+        showLoading(true, "データを送信中...");
+
+        try {
+            // ★★★ ここに、あなたが発行したGASのウェブアプリURLを貼り付けてください ★★★
+            const gasWebAppUrl = 'https://script.google.com/macros/s/AKfycbz0bmNUp44bmRt6_HEC1kulC1SAcEhP7VljceEIT4uqrXfb5wA-ICiO2YN1WlPTYvsA/exec'; 
+
+            const dataToSave = { ...experimentData };
+            dataToSave.experimentEndTimeISO = new Date().toISOString();
+            
+            // GASにデータを送信
+            await fetch(gasWebAppUrl, {
+                method: 'POST',
+                mode: 'no-cors', // CORSエラーを回避するためのおまじない
+                redirect: 'follow',
+                body: JSON.stringify(dataToSave),
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8',
                 }
-            }
-            if (!surveyData.unknown_foods) {
-                surveyData.unknown_foods = [];
-            }
-            experimentData.survey = surveyData;
-            showLoading(true, "データを保存中...");
- try {
-    const gasWebAppUrl = 'https://script.google.com/macros/s/AKfycbz0bmNUp44bmRt6_HEC1kulC1SAcEhP7VljceEIT4uqrXfb5wA-ICiO2YN1WlPTYvsA/exec'; // ★★★必ず書き換えてください★★★
+            });
 
-    const dataToSave = { ...experimentData };
-    dataToSave.experimentEndTimeISO = new Date().toISOString();
+            // 成功したら完了画面へ
+            showScreen(screen5);
 
-    // GASにデータを送信
-    await fetch(gasWebAppUrl, {
-        method: 'POST',
-        mode: 'no-cors', // CORSエラーを回避するためのおまじない
-        headers: {
-            'Content-Type': 'text/plain;charset=utf-8',
-        },
-        body: JSON.stringify(dataToSave)
+        } catch (error) {
+            console.error('[CRITICAL_ERROR] Data submission failed:', error);
+            alert('データの送信に失敗しました。管理者にお知らせください。');
+        } finally {
+            showLoading(false);
+        }
     });
-
-    // 成功したら完了画面へ
-    showScreen(screen5);
-
-} catch (error) {
-    console.error('[CRITICAL_ERROR] Data submission failed:', error);
-    alert('データの送信に失敗しました。管理者にお知らせください。');
-} finally {
-    showLoading(false);
 }
-        });
-    }
-
     if (backToScreen1Btn) {
         backToScreen1Btn.addEventListener('click', () => {
             if (confirm("前の画面に戻りますか？")) {
