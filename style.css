@@ -373,3 +373,11 @@ button:disabled { background-color: #cccccc; cursor: not-allowed; transform: non
         box-shadow: 0 0 3px rgba(255, 0, 0, 0.4);
     }
 }
+
+#screen2 h4 { /* 説明画面の小見出し */
+    color: #0056b3;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 5px;
+}
