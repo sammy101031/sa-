@@ -274,7 +274,7 @@ function initializeApp() {
 
    // ▼▼▼ このブロックを丸ごと追加 ▼▼▼
 if (submitAndFinishBtn) {
-    submitAndFinishBtn.addEventListener('click', async (e) => { // async を追加
+    submitAndFinishBtn.addEventListener('click', async (e) => { // (e) の前に async を追加
         e.preventDefault();
         const form = document.getElementById('surveyForm');
         if (!form.checkValidity()) {
