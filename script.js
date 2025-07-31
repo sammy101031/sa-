@@ -192,7 +192,7 @@ function initializeApp() {
             goToFeedbackBtn.style.display = 'inline-block';
             updateStatusMessage('食品を円で囲んでクラスターを作成 (3つ以上中に入れる)、または既存のクラスターをクリックして削除できます。');
         });
-    }
+    
 
     if (goToFeedbackBtn) {
         goToFeedbackBtn.addEventListener('click', () => {
