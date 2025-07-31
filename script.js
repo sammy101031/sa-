@@ -31,7 +31,6 @@ let foodList = [
     { name: "yakionigiri", label: "焼きおにぎり", imgSrc: "https://m.media-amazon.com/images/I/71+s1Tix9qL.jpg", info: "香りを立たせ、持続させるニッスイの独自技術「香りのＷアップ製法」で、しょうゆの風味と香りをより引き立たせました。\nたまりしょうゆと二段仕込みしょうゆをブレンドした、まろやかでコクのあるしょうゆの風味豊かな焼きおにぎりです。" },
     { name: "reitou_udon", label: "冷凍うどん", imgSrc: "https://www.tablemark.co.jp/products/frozen/udon/detail/__icsFiles/afieldfile/2016/07/08/7116302.jpg", info: "強いコシと弾力のさぬきうどんに、瀬戸内産いりこを使用しただし香るまろやかでコクのあるつゆ。麺はこだわりの包丁切りで、つゆとの絡みも良くお召し上がりいただけます。" },
     { name: "reitou_pasta", label: "冷凍パスタ", imgSrc: "https://www.nippn.co.jp/products/frozen/ohmy_premium/detail/__icsFiles/afieldfile/2025/02/14/op_bolognese.jpg", info: "牛挽肉の旨みと赤ワインの風味が特長のボロネーゼソース。ゴーダチーズとごろっと大きな揚げなすをトッピング。" },
-    { name: "fried_potato", label: "フライドポテト", imgSrc: "https://res.cloudinary.com/hsxfx8igq/image/upload/t_16x9_recipe_image,f_auto,q_auto/v1638832067/McCain_Fry_Shot_8_Original_zmaxmf.jpg", info: "じゃがいもを細長く切って油で揚げた、世界中で人気のスナック。\n冷凍品を家庭で揚げるだけで、カリッとした食感が楽しめます。" },
     { name: "karaage", label: "鶏のから揚げ", imgSrc: "https://www.ffa.ajinomoto.com/_var/images/products/345/65a665121d4b5.png?resize=1200x630", info: "食欲を満たす肉の塊、これぞから揚げの金字塔！\nにんにく風味アップでさらに白飯がガツガツ進む！\n秘伝にんにく油、葱油、特級醤油の極旨仕込みだれにじっくり漬け込んだ香りがクセになるから揚げです。\n火入れの温度にこだわった”秘伝にんにく油”でにんにくの香りが引き立ち、肉汁がジュワッと広がります。" };
 
 function getCurrentTimestamp() {
